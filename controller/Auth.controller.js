@@ -36,8 +36,11 @@ module.exports = {
             if (!user) {
                 return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
             }
-            // const isPasswordValid = await bcrypt.compare(password, user.password);
-            if (!password) {
+            
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            // const passwordUser = await AuthModel.findOne({ password });
+            
+            if (!isPasswordValid) {
                 return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
             }
             const token = jwt.sign({ userId: user.id }, 'votre_clé_secrète', { expiresIn: '1h' });
