@@ -38,13 +38,12 @@ module.exports = {
             }
             
             const isPasswordValid = await bcrypt.compare(password, user.password);
-            // const passwordUser = await AuthModel.findOne({ password });
             
             if (!isPasswordValid) {
                 return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
             }
             const token = jwt.sign({ userId: user.id }, 'votre_clé_secrète', { expiresIn: '1h' });
-            res.status(200).json({ token });
+            res.status(200).json({ token, user });
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
@@ -105,9 +104,9 @@ module.exports = {
         )
             .then((updatedUser) => {
                 if (!updatedUser) {
-                    return res.status(404).send({ error: 'User non trouvée' });
+                    return res.status(404).send({ error: 'User non trouvee' });
                 }
-                res.send('User mise à jour avec succès');
+                res.send('User mise à jour avec succes');
             })
             .catch((err) => {
                 res.status(500).send({ error: err.message });

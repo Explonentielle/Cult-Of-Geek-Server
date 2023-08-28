@@ -23,7 +23,7 @@ module.exports = server => {
         res.status(404).send("rien a faire ici")
     })
 
-    server.post('/register', AuthController.register);
+    server.post('/api/Auth/register', AuthController.register);
 
     server.post('/api/Auth/login', (req, res) => {
         AuthController.login(req, res)})
