@@ -49,46 +49,8 @@ module.exports = {
             res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
         }
     },
-
-
-
     
-    getAll(req, res) {
-        AuthModel.find().then(user => {
-            res.send(user)
-        }).catch(err => {
-            res.status(404).send({ error: "user non trouvé" })
-        })
-    },
-    get(req, res) {
-        const email = req.params.email
-        AuthModel.findById(email).then(user => {
-            if (user) {
-                res.send(user)
-            }
-            else {
-                res.status(404).send({ error: "user non trouvé" })
-            }
-        }).catch(err => {
-            res.status(500).send({ error: err.message })
-        })
-    },
-    create(req, res) {
-        const user = new AuthModel({
-            id: req.body.id,
-            fname: req.body.fname,
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            age: req.body.age,
-            location: req.body.location
-        })
-
-        user.save().then(() => res.send("user ajouté avec succés")).catch(err => {
-            res.status(404).send({ error: err.message })
-        })
-    },
-    modif(req, res) {
+    passwordModif: async (req, res) => {
         const id = req.body._id;
         AuthModel.findByIdAndUpdate(
             id,
@@ -112,6 +74,33 @@ module.exports = {
                 res.status(500).send({ error: err.message });
             })
     },
+
+
+
+    ////////////////////////////////////////////////
+    
+    getAll(req, res) {
+        AuthModel.find().then(user => {
+            res.send(user)
+        }).catch(err => {
+            res.status(404).send({ error: "user non trouvé" })
+        })
+    },
+    get(req, res) {
+        const email = req.params.email
+        AuthModel.findById(email).then(user => {
+            if (user) {
+                res.send(user)
+            }
+            else {
+                res.status(404).send({ error: "user non trouvé" })
+            }
+        }).catch(err => {
+            res.status(500).send({ error: err.message })
+        })
+    },
+
+  
     delete(req, res) {
         const email = req.params.email
         AuthModel.findByIdAndDelete(email).then(user => res.send(

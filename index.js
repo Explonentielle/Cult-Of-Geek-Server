@@ -1,4 +1,5 @@
 const express = require("express");
+const dotenv = require('dotenv').config()
 const mongoose = require("mongoose");
 const cors = require('cors');
 const server = express();
@@ -9,7 +10,7 @@ server.use(cors());
 
 server.listen(5500, () => {
     console.log("serveur lancer et a l'ecoute du port 5500")
-    mongoose.connect("mongodb+srv://alexandreDebonnieres:O4w76gHlfh8WLT5m@cluster0.ijckec9.mongodb.net/?retryWrites=true&w=majority")
+    mongoose.connect(process.env.MONGO_URL)
 
     const db = mongoose.connection;
 
@@ -19,7 +20,6 @@ server.listen(5500, () => {
 
 server.get("/", (req, res) => {
     console.log("coucou")
-
     res.send("bienvenue")
 })
 
