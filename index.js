@@ -5,7 +5,14 @@ const cors = require('cors');
 const server = express();
 const routes = require("./routes/Auth.routes")
 server.use(express.json())
-server.use(cors()); 
+const cookieParser = require('cookie-parser');
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+};
+server.use(cors(corsOptions));
+server.use(cookieParser())
+
 
 
 server.listen(5500, () => {

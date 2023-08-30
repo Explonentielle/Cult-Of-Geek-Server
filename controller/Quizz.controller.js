@@ -21,5 +21,13 @@ module.exports = {
             .catch(err => {
                 res.status(404).send({ error: err.message });
             });
-    }
+    },
+    
+    getAll(req, res) {
+        QuizzModel.find().then(quizz => {
+            res.send(quizz)
+        }).catch(err => {
+            res.status(404).send({ error: "quizz non trouvé" })
+        })
+    },
 }

@@ -1,6 +1,7 @@
 const AuthModel = require("../model/Auth.model")
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = '132547698';
 
 module.exports = {
 
@@ -27,7 +28,6 @@ module.exports = {
             res.status(500).json({ message: 'Une erreur est survenue lors de l\'inscription.' });
         }
     },
-    
 
     login: async (req, res) => {
         try {
@@ -36,23 +36,88 @@ module.exports = {
             if (!user) {
                 return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
             }
-            
-            const isPasswordValid = await bcrypt.compare(password, user.password);
-            
+    
+            const isPasswordValid = bcrypt.compare(password, user.password);
+     
             if (!isPasswordValid) {
                 return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
             }
-            const token = jwt.sign({ userId: user.id }, 'votre_clé_secrète', { expiresIn: '1h' });
-            res.status(200).json({ token, user });
+            else {
+                const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+                res.cookie('token', token).json(token)
+            }
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
         }
     },
     
+    // login: async (req, res) => {
+    //     try {
+    //         const { email, password } = req.body;
+    //         const user = await AuthModel.findOne({ email });
+    //         if (!user) {
+    //             return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
+    //         }
+
+    //         const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    //         if (!isPasswordValid) {
+    //             return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
+    //         }
+    //         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+    //         res.status(200).json({ token, user });
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
+    //     }
+    // },
+
+    // getProfile:  (req, res) => {
+    //     const { token } = req.cookies
+    //     console.log(token)
+
+    //     if (!token) {
+    //         return res.status(401).json({ message: 'Authentication required' });
+    //     }
+
+    //     jwt.verify(token, JWT_SECRET,  (err, user) => {
+    //         if (err) {
+    //             return res.status(401).json({ message: 'Invalid token' });
+    //         }
+    //         else {
+    //             res.status(200).json(user);
+    //         }
+    //     });
+    // },
+
+    getProfile: (req, res) => {
+        const { token } = req.cookies;
+        console.log(token)
+
+        if (!token) {
+          return res.status(401).json({ message: 'Authentication required' });
+        }
+      
+        jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
+          if (err) {
+            return res.status(401).json({ message: 'Invalid token' });
+          }
+          
+          const userId = decodedToken.userId;
+    
+          AuthModel.findById(userId, (userErr, user) => {
+            if (userErr) {
+              return res.status(500).json({ message: 'Error fetching user data' });
+            }
+            res.status(200).json(user);
+          });
+        });
+      },
+
     passwordModif: async (req, res) => {
         const id = req.body._id;
-        AuthModel.findByIdAndUpdate(
+        AuthModel.findByIdAndUpdate( 
             id,
             {
                 id: req.body.id,
@@ -75,37 +140,4 @@ module.exports = {
             })
     },
 
-
-
-    ////////////////////////////////////////////////
-    
-    getAll(req, res) {
-        AuthModel.find().then(user => {
-            res.send(user)
-        }).catch(err => {
-            res.status(404).send({ error: "user non trouvé" })
-        })
-    },
-    get(req, res) {
-        const email = req.params.email
-        AuthModel.findById(email).then(user => {
-            if (user) {
-                res.send(user)
-            }
-            else {
-                res.status(404).send({ error: "user non trouvé" })
-            }
-        }).catch(err => {
-            res.status(500).send({ error: err.message })
-        })
-    },
-
-  
-    delete(req, res) {
-        const email = req.params.email
-        AuthModel.findByIdAndDelete(email).then(user => res.send(
-            `supression de l'utilisateur' ${user.email}`)).catch(err => {
-                res.status(500).send({ error: err.message })
-            })
-    }
 }
