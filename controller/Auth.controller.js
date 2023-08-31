@@ -36,88 +36,56 @@ module.exports = {
             if (!user) {
                 return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
             }
-    
-            const isPasswordValid = bcrypt.compare(password, user.password);
-     
+
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
             if (!isPasswordValid) {
                 return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
             }
-            else {
-                const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-                res.cookie('token', token).json(token)
-            }
+            const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+            // res.status(200).json({ token, user });
+            // res.cookie('token', token).json(user)
+            res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
+            res.status(200).json({ user, token });
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
         }
     },
-    
-    // login: async (req, res) => {
-    //     try {
-    //         const { email, password } = req.body;
-    //         const user = await AuthModel.findOne({ email });
-    //         if (!user) {
-    //             return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
-    //         }
 
-    //         const isPasswordValid = await bcrypt.compare(password, user.password);
+    logout: (req, res) => {
+        res.clearCookie('token');
+        res.status(200).json({ message: 'Logout successful' });
+    },
 
-    //         if (!isPasswordValid) {
-    //             return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
-    //         }
-    //         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-    //         res.status(200).json({ token, user });
-    //     } catch (error) {
-    //         console.error(error);
-    //         res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
-    //     }
-    // },
-
-    // getProfile:  (req, res) => {
-    //     const { token } = req.cookies
-    //     console.log(token)
-
-    //     if (!token) {
-    //         return res.status(401).json({ message: 'Authentication required' });
-    //     }
-
-    //     jwt.verify(token, JWT_SECRET,  (err, user) => {
-    //         if (err) {
-    //             return res.status(401).json({ message: 'Invalid token' });
-    //         }
-    //         else {
-    //             res.status(200).json(user);
-    //         }
-    //     });
-    // },
-
-    getProfile: (req, res) => {
+    getProfil: async (req, res) => {
         const { token } = req.cookies;
-        console.log(token)
 
         if (!token) {
-          return res.status(401).json({ message: 'Authentication required' });
+            return res.status(401).json({ message: 'Authentication required' });
         }
-      
-        jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
-          if (err) {
-            return res.status(401).json({ message: 'Invalid token' });
-          }
-          
-          const userId = decodedToken.userId;
-    
-          AuthModel.findById(userId, (userErr, user) => {
-            if (userErr) {
-              return res.status(500).json({ message: 'Error fetching user data' });
+        jwt.verify(token, JWT_SECRET, async (err, decodedToken) => {
+            if (err) {
+                return res.status(401).json({ message: 'Invalid token' });
             }
-            res.status(200).json(user);
-          });
+            const { email } = decodedToken;
+            try {
+                const user = await AuthModel.findOne({ email });
+                if (!user) {
+                    return res.status(401).json({ message: 'User not found' });
+                }
+                res.status(200).json(user);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'An error occurred while fetching user data' });
+            }
         });
-      },
+    },
+
 
     passwordModif: async (req, res) => {
         const id = req.body._id;
-        AuthModel.findByIdAndUpdate( 
+        AuthModel.findByIdAndUpdate(
             id,
             {
                 id: req.body.id,
