@@ -122,4 +122,29 @@ module.exports = {
                 res.status(500).send({ error: err.message });
             })
     },
+
+    addQuizz: async (req, res) => {
+        try {
+          const userId = req.params.userId
+          console.log(userId)
+
+          const quizData = req.body.quizz
+          console.log(quizData)
+      
+          const user = await AuthModel.findById(userId)
+      
+          if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' })
+          }
+      
+          user.quizzes.push(quizData)
+      
+          await user.save()
+      
+          res.status(201).json({ message: 'Quiz ajouté à l\'utilisateur avec succès' })
+        } catch (error) {
+          console.error(error)
+          res.status(500).json({ message: 'Une erreur s\'est produite lors de l\'ajout du quiz à l\'utilisateur' })
+        }
+      },
 }

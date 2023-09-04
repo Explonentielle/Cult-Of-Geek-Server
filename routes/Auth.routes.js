@@ -13,6 +13,8 @@ module.exports = server => {
 
     server.get('/api/Auth/getProfil', AuthController.getProfil);
 
+    server.post('/api/Auth/:userId/add-quizz', AuthController.addQuizz);
+
     // route Quizz 
 
     server.post("/api/Quizz/create", (req, res) => {

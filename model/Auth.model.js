@@ -15,7 +15,26 @@ const AuthSchema = new Schema({
     },
     password: String,   // Champ pour le mot de passe haché de l'utilisateur
     age: Number,        // Champ pour l'âge de l'utilisateur
-    location: String,   // Champ pour l'emplacement de l'utilisateur
+    location: String, 
+    quizzes: [
+        {
+          title: String,   // Champ pour le titre du quizgit add
+          theme: String,   // Champ pour le thème du quiz
+          content: [       // Champ pour le contenu du quiz, qui est un tableau d'objets
+            {
+              question: String,   // Champ pour la question du quiz
+              answers: [          // Champ pour les réponses possibles, qui est un tableau d'objets
+                {
+                  id: Number,      // Champ pour l'identifiant de la réponse
+                  text: String,    // Champ pour le texte de la réponse
+                  correct: Boolean // Champ pour indiquer si la réponse est correcte ou non
+                },
+                // Les autres réponses possibles sont également définies de la même manière
+              ]
+            }
+          ]
+        }
+      ],  // Champ pour l'emplacement de l'utilisateur
 })
 
 // Créer un modèle Mongoose à partir du schéma, nommé "Auth" qui sera utilisé pour interagir avec la base de données
