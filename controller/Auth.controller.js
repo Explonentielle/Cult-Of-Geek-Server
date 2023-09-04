@@ -141,7 +141,7 @@ module.exports = {
       
           await user.save()
       
-          res.status(201).json({ message: 'Quiz ajouté à l\'utilisateur avec succès' })
+          res.status(201).json({ message: 'Quiz Enregistré sur votre profil avec succès' })
         } catch (error) {
           console.error(error)
           res.status(500).json({ message: 'Une erreur s\'est produite lors de l\'ajout du quiz à l\'utilisateur' })
