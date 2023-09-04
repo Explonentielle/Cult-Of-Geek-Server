@@ -17,7 +17,6 @@ module.exports = server => {
 
     server.post("/api/Quizz/create", (req, res) => {
         QuizzController.create(req, res)
-        res.send('Requête POST traitée avec succès !');
     });
 
     server.get('/api/Quizz', (req, res) => {
