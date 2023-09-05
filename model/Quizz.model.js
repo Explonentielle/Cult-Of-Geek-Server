@@ -7,7 +7,8 @@ const Schema = mongoose.Schema;
 // Créer un schéma (ou modèle) pour les quiz
 const QuizzSchema = new Schema({
     title: String,   // Champ pour le titre du quiz
-    theme: String,   // Champ pour le thème du quiz
+    theme: String, 
+    isPrivate: Boolean,  // Champ pour le thème du quiz
     content: [       // Champ pour le contenu du quiz, qui est un tableau d'objets
         {
             question: String,   // Champ pour la question du quiz

@@ -8,6 +8,7 @@ module.exports = {
         const quizz = new QuizzModel({
             title: req.body.title,
             theme: req.body.theme,
+            isPrivate:  req.body.isPrivate,
             content: req.body.content.map(content => ({
                 question: content.question,
                 answers: content.answers.map(answer => ({

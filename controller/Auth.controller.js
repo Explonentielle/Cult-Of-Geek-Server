@@ -126,21 +126,13 @@ module.exports = {
     addQuizz: async (req, res) => {
         try {
           const userId = req.params.userId
-          console.log(userId)
-
           const quizData = req.body.quizz
-          console.log(quizData)
-      
           const user = await AuthModel.findById(userId)
-      
           if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' })
           }
-      
           user.quizzes.push(quizData)
-      
           await user.save()
-      
           res.status(201).json({ message: 'Quiz Enregistré sur votre profil avec succès' })
         } catch (error) {
           console.error(error)

@@ -20,6 +20,7 @@ const AuthSchema = new Schema({
         {
           title: String,   // Champ pour le titre du quizgit add
           theme: String,   // Champ pour le thème du quiz
+          isPrivate: Boolean,  // Champ la visibilité du quizz
           content: [       // Champ pour le contenu du quiz, qui est un tableau d'objets
             {
               question: String,   // Champ pour la question du quiz
