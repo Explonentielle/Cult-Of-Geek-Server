@@ -15,6 +15,8 @@ module.exports = server => {
 
     server.post('/api/Auth/:userId/add-quizz', AuthController.addQuizz);
 
+    server.delete('/api/Auth/:userId/delete-quizz/:quizzId', AuthController.deleteQuizz);
+
     // route Quizz 
 
     server.post("/api/Quizz/create", (req, res) => {

@@ -1,4 +1,5 @@
 const AuthModel = require("../model/Auth.model")
+const QuizzModel = require("../model/Quizz.model")
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = '132547698';
@@ -49,10 +50,10 @@ module.exports = {
             if (!isPasswordValid) {
                 return res.status(401).json({ message: 'E-mail ou mot de passe incorrect.' });
             }
-            
+
             // Générer un jeton JWT pour l'utilisateur authentifié
             const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
-            
+
             // Stocker le jeton JWT dans un cookie HTTP
             res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
             res.status(200).json({ user, token });
@@ -76,7 +77,7 @@ module.exports = {
         if (!token) {
             return res.status(401).json({ message: 'Authentication required' });
         }
-        
+
         // Vérifier et décoder le jeton JWT
         jwt.verify(token, JWT_SECRET, async (err, decodedToken) => {
             if (err) {
@@ -125,18 +126,44 @@ module.exports = {
 
     addQuizz: async (req, res) => {
         try {
-          const userId = req.params.userId
-          const quizData = req.body.quizz
-          const user = await AuthModel.findById(userId)
-          if (!user) {
-            return res.status(404).json({ message: 'Utilisateur non trouvé' })
-          }
-          user.quizzes.push(quizData)
-          await user.save()
-          res.status(201).json({ message: 'Quiz Enregistré sur votre profil avec succès' })
+            const userId = req.params.userId
+            const quizData = req.body.quizz
+            const user = await AuthModel.findById(userId)
+            if (!user) {
+                return res.status(404).json({ message: 'Utilisateur non trouvé' })
+            }
+            user.quizzes.push(quizData)
+            await user.save()
+            res.status(201).json({ message: 'Quiz Enregistré sur votre profil avec succès' })
         } catch (error) {
-          console.error(error)
-          res.status(500).json({ message: 'Une erreur s\'est produite lors de l\'ajout du quiz à l\'utilisateur' })
+            console.error(error)
+            res.status(500).json({ message: 'Une erreur s\'est produite lors de l\'ajout du quiz à l\'utilisateur' })
         }
-      },
-}
+    },
+
+    deleteQuizz: async (req, res) => {
+        try {
+            const userId = req.params.userId;
+            const quizzId = req.params.quizzId; 
+
+            const user = await AuthModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ message: 'Utilisateur non trouvé' });
+            }
+
+            const quizzIndex = user.quizzes.findIndex(quiz => quiz._id.toString() === quizzId);
+            if (quizzIndex === -1) {
+                return res.status(404).json({ message: 'Quizz non trouvé pour cet utilisateur' });
+            }
+
+            user.quizzes.splice(quizzIndex, 1);
+            await user.save();
+
+            return res.status(200).json({ message: 'Quizz supprimé avec succès' });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Erreur lors de la suppression du quizz' });
+        }
+    },
+};
+
